@@ -12,6 +12,11 @@
     <artifactId>jpa</artifactId>
     <version>${flexitech.version}</version>
 </dependency>
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>${mysql.8.version}</version>
+</dependency>
 ```
 
 ### 2. Enable JPA
