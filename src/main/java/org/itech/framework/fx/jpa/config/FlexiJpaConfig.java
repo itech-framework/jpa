@@ -69,6 +69,14 @@ public class FlexiJpaConfig {
         }
     }
 
+    /*private ValidatorFactory buildValidatorFactory() {
+        return Validation.byProvider(HibernateValidator.class)
+                .configure()
+                .messageInterpolator(new ParameterMessageInterpolator())
+                .externalClassLoader(Thread.currentThread().getContextClassLoader())
+                .buildValidatorFactory();
+    }*/
+
     private void configureProperties() {
         // Required properties
         setRequiredProperty(AvailableSettings.JAKARTA_JDBC_URL, "flexi.jpa.connection.url");

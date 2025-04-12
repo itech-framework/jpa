@@ -74,9 +74,13 @@ public class SimpleFlexiJpaRepository<T, ID> implements FlexiJpaRepository<T, ID
 
     // Enhanced CRUD operations
     @Override
-    public T save(T entity) {
+    public T save(final T entity) {
         return executeReturningTransaction(session -> {
-            session.persist(entity);
+            if (isNewEntity(entity)) {
+                session.persist(entity);
+            } else {
+               return session.merge(entity);
+            }
             return entity;
         });
     }
@@ -107,11 +111,12 @@ public class SimpleFlexiJpaRepository<T, ID> implements FlexiJpaRepository<T, ID
         });
     }
 
-    // Enhanced query methods
+    @Override
     public <R> R executeQuery(Function<Session, R> query) {
         return executeReturningTransaction(query);
     }
 
+    @Override
     public List<T> findBy(String queryString, QueryParameters parameters) {
         return executeReturningTransaction(session -> {
             TypedQuery<T> query = session.createQuery(queryString, entityClass);
@@ -120,6 +125,7 @@ public class SimpleFlexiJpaRepository<T, ID> implements FlexiJpaRepository<T, ID
         });
     }
 
+    @Override
     public Optional<T> findOneBy(String queryString, QueryParameters parameters) {
         return Optional.ofNullable(
                 executeReturningTransaction(session -> {
@@ -130,6 +136,7 @@ public class SimpleFlexiJpaRepository<T, ID> implements FlexiJpaRepository<T, ID
         );
     }
 
+    @Override
     public Page<T> findAll(Pageable pageable) {
         return executeReturningTransaction(session -> {
             CriteriaBuilder cb = session.getCriteriaBuilder();
@@ -149,41 +156,12 @@ public class SimpleFlexiJpaRepository<T, ID> implements FlexiJpaRepository<T, ID
         });
     }
 
+
+    private boolean isNewEntity(T entity) {
+        // Implement your logic to check if entity is new
+        // Example for typical ID-based check:
+        return (Long) jpaConfig.getSessionFactory().getPersistenceUnitUtil().getIdentifier(entity) == null;
+    }
     // Helper classes
-    public static class QueryParameters {
-        private final Map<String, Object> parameters = new HashMap<>();
 
-        public QueryParameters add(String name, Object value) {
-            parameters.put(name, value);
-            return this;
-        }
-
-        void applyTo(TypedQuery<?> query) {
-            parameters.forEach(query::setParameter);
-        }
-    }
-
-    public static class Pageable {
-        private final int page;
-        private final int size;
-
-        public Pageable(int page, int size) {
-            this.page = page;
-            this.size = size;
-        }
-
-        public int getOffset() {
-            return page * size;
-        }
-
-        public int getPageSize() {
-            return size;
-        }
-    }
-
-    public record Page<T>(List<T> content, long totalElements, Pageable pageable) {
-        public int getTotalPages() {
-            return (int) Math.ceil((double) totalElements / pageable.getPageSize());
-        }
-    }
 }
