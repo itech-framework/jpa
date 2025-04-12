@@ -12,6 +12,11 @@
     <artifactId>jpa</artifactId>
     <version>${flexitech.version}</version>
 </dependency>
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>${mysql.8.version}</version>
+</dependency>
 ```
 
 ### 2. Enable JPA
@@ -38,6 +43,9 @@ flexi.jpa.connection.password={db_password}
 # Hibernate Settings
 flexi.jpa.dialect={db_dialect}
 flexi.jpa.hbm2ddl.auto={ddl_auto}
+
+# Entities packages
+flexi.jpa.entity-package=your.entities.class.package
 ```
 
 ## 🧩 Example Entity
