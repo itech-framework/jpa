@@ -7,18 +7,27 @@
 
 ### 1. Add Dependency
 ```xml
-<dependency>
-    <groupId>io.github.itech_framework.core.</groupId>
-    <artifactId>jpa</artifactId>
-    <version>${flexitech.version}</version>
-</dependency>
-<dependency>
-    <groupId>mysql</groupId>
-    <artifactId>mysql-connector-java</artifactId>
-    <version>${mysql.8.version}</version>
-</dependency>
+<dependencies>
+    <dependency>
+        <groupId>io.github.itech-framework</groupId>
+        <artifactId>core</artifactId>
+        <version>1.0.1</version>
+    </dependency>
 
-<!-- Other hibernates(v6+) and jarkata persistence api-->
+    <dependency>
+        <groupId>io.github.itech-framework</groupId>
+        <artifactId>java-fx</artifactId>
+        <version>1.0.1</version>
+    </dependency>
+
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>${mysql.8.version}</version>
+    </dependency>
+
+    <!-- Other hibernates(v6+) and jarkata persistence api-->
+</dependencies>
 ```
 
 ### 2. Enable JPA
