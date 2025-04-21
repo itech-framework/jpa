@@ -8,7 +8,7 @@
 ### 1. Add Dependency
 ```xml
 <dependency>
-    <groupId>org.itech.framework.fx</groupId>
+    <groupId>io.github.itech_framework.core.</groupId>
     <artifactId>jpa</artifactId>
     <version>${flexitech.version}</version>
 </dependency>
@@ -17,6 +17,8 @@
     <artifactId>mysql-connector-java</artifactId>
     <version>${mysql.8.version}</version>
 </dependency>
+
+<!-- Other hibernates(v6+) and jarkata persistence api-->
 ```
 
 ### 2. Enable JPA
@@ -62,7 +64,7 @@ public class User {
 
 ## 🤝 Support
 For assistance:  
-📧 Email: `support@flexitech.com`  
+📧 Email: `itech.saizawmyint@gmail.com`  
 📑 [Open an Issue]([https://github.com/your-repo/issues](https://github.com/itech-framework/jpa/issues))
 
 ---
