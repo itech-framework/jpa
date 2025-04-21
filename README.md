@@ -74,7 +74,7 @@ public class User {
 ## 🤝 Support
 For assistance:  
 📧 Email: `itech.saizawmyint@gmail.com`  
-📑 [Open an Issue]([https://github.com/your-repo/issues](https://github.com/itech-framework/jpa/issues))
+📑 [Open an Issue](https://github.com/itech-framework/jpa/issues)
 
 ---
 
