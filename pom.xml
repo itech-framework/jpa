@@ -4,9 +4,46 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.itech.framework.fx</groupId>
+    <groupId>io.github.itech-framework</groupId>
     <artifactId>jpa</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.1</version>
+
+    <name>iTech Framework - JPA Module</name>
+    <description>
+        JPA integration module for the ITech Framework, simplifying database interactions
+        with JPA and Hibernate. Features include:
+        - JPA entity management with Hibernate integration
+        - Annotation-driven repository support
+        - Transaction management utilities
+        - Schema generation and validation
+        - Log4j-powered query/transaction logging
+        - Java 17+ compatibility (Records, sealed classes, etc.)
+        - Lightweight configuration via annotations or properties
+    </description>
+    <url>https://github.com/itech-framework/jpa</url>
+
+    <!-- Licensing Information -->
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Sai Zaw Myint</name>
+            <email>itech.saizawmyint@gmail.com</email>
+        </developer>
+    </developers>
+
+    <!-- SCM Configuration -->
+    <scm>
+        <connection>scm:git:https://github.com/itech-framework/jpa.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/itech-framework/jpa.git</developerConnection>
+        <url>https://github.com/itech-framework/jpa/tree/main</url>
+    </scm>
+
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -16,9 +53,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.itech.framework.fx</groupId>
-            <artifactId>itechfx</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>io.github.itech-framework</groupId>
+            <artifactId>core</artifactId>
+            <version>1.0.1</version>
         </dependency>
 
         <dependency>
@@ -46,14 +83,6 @@
             <version>6.4.4.Final</version>
         </dependency>
 
-
-
-        <!--<dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>8.0.1.Final</version>
-        </dependency>-->
-
         <!-- JAXB API (Required for Java 17+) -->
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
@@ -69,20 +98,67 @@
             <version>3.1.0</version>
         </dependency>
 
-        <!--&lt;!&ndash; https://mvnrepository.com/artifact/jakarta.el/jakarta.el-api &ndash;&gt;
-        <dependency>
-            <groupId>jakarta.el</groupId>
-            <artifactId>jakarta.el-api</artifactId>
-            <version>5.0.1</version>
-        </dependency>
-
-        &lt;!&ndash; https://mvnrepository.com/artifact/org.glassfish/jakarta.el &ndash;&gt;
-        <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.el</artifactId>
-            <version>4.0.2</version>
-            <scope>compile</scope>
-        </dependency>-->
-
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.7.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <source>17</source>
+                    <doclint>none</doclint>
+                    <show>protected</show>
+                    <links>
+                        <link>https://docs.oracle.com/en/java/javase/17/docs/api</link>
+                    </links>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
