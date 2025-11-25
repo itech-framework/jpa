@@ -1,7 +1,21 @@
 package io.github.itech_framework.jpa.config;
 
-import jakarta.persistence.Entity;
-import lombok.Getter;
+import java.io.File;
+import java.io.IOException;
+import java.net.JarURLConnection;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
@@ -9,20 +23,11 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.AvailableSettings;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import io.github.itech_framework.core.utils.PropertiesLoader;
+
 import io.github.itech_framework.core.exceptions.FrameworkException;
+import io.github.itech_framework.core.utils.PropertiesLoader;
+import jakarta.persistence.Entity;
 
-import java.io.File;
-import java.net.URL;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-@Getter
 public class FlexiJpaConfig {
     private static final Logger logger = LogManager.getLogger(FlexiJpaConfig.class);
 
@@ -131,31 +136,100 @@ public class FlexiJpaConfig {
 
         try {
             String path = packageName.replace('.', '/');
-            URL resource = Thread.currentThread().getContextClassLoader().getResource(path);
-            if (resource == null) {
-                throw new FrameworkException("Entity package path not found: " + packageName);
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            Enumeration<URL> resources = classLoader.getResources(path);
+            
+            Set<Class<?>> entities = new HashSet<>();
+            
+            while (resources.hasMoreElements()) {
+                URL resource = resources.nextElement();
+                
+                if (resource.getProtocol().equals("file")) {
+                    // Development mode - running from file system
+                    File directory = new File(resource.toURI());
+                    if (directory.exists() && directory.isDirectory()) {
+                        entities.addAll(scanFilesystemEntities(directory, packageName));
+                    }
+                } else if (resource.getProtocol().equals("jar")) {
+                    // Production mode - running from JAR
+                    entities.addAll(scanJarEntities(resource, packageName, path));
+                }
             }
-
-            File directory = new File(resource.toURI());
-            if (!directory.exists() || !directory.isDirectory()) {
-                throw new FrameworkException("Entity package directory does not exist: " + packageName);
-            }
-
-            return Stream.of(Objects.requireNonNull(directory.listFiles((dir, name) -> name.endsWith(".class"))))
-                    .map(file -> {
-                        String className = packageName + "." + file.getName().replace(".class", "");
-                        try {
-                            return Class.forName(className);
-                        } catch (ClassNotFoundException e) {
-                            logger.warn("Could not load class: {}", className, e);
-                            return null;
-                        }
-                    })
-                    .filter(clazz -> clazz != null && clazz.isAnnotationPresent(Entity.class))
-                    .collect(Collectors.toSet());
-
+            
+            return entities;
+            
         } catch (Exception e) {
             throw new FrameworkException("Failed to scan entity package: " + packageName, e);
         }
     }
+
+    private Set<Class<?>> scanFilesystemEntities(File directory, String packageName) {
+        return Stream.of(Objects.requireNonNull(directory.listFiles((dir, name) -> name.endsWith(".class"))))
+                .map(file -> {
+                    String className = packageName + "." + file.getName().replace(".class", "");
+                    try {
+                        return Class.forName(className);
+                    } catch (ClassNotFoundException e) {
+                        logger.warn("Could not load class: {}", className, e);
+                        return null;
+                    }
+                })
+                .filter(clazz -> clazz != null && clazz.isAnnotationPresent(Entity.class))
+                .collect(Collectors.toSet());
+    }
+
+    private Set<Class<?>> scanJarEntities(URL resource, String packageName, String path) {
+        Set<Class<?>> entities = new HashSet<>();
+        
+        try {
+            JarURLConnection jarConnection = (JarURLConnection) resource.openConnection();
+            JarFile jar = jarConnection.getJarFile();
+            
+            Enumeration<JarEntry> entries = jar.entries();
+            while (entries.hasMoreElements()) {
+                JarEntry entry = entries.nextElement();
+                String entryName = entry.getName();
+                
+                // Check if this entry is in our package and is a class file
+                if (entryName.startsWith(path) && entryName.endsWith(".class") && !entryName.contains("$")) {
+                    String className = entryName.replace('/', '.')
+                                              .substring(0, entryName.length() - 6); // Remove .class
+                    try {
+                        Class<?> clazz = Class.forName(className);
+                        if (clazz.isAnnotationPresent(Entity.class)) {
+                            entities.add(clazz);
+                        }
+                    } catch (ClassNotFoundException e) {
+                        logger.warn("Could not load class: {}", className, e);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new FrameworkException("Failed to scan JAR for entities", e);
+        }
+        
+        return entities;
+    }
+
+	public SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
+
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
+
+	public boolean isInitialized() {
+		return initialized;
+	}
+
+	public void setInitialized(boolean initialized) {
+		this.initialized = initialized;
+	}
+
+	public Properties getHibernateProperties() {
+		return hibernateProperties;
+	}
+    
+    
 }

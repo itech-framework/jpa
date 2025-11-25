@@ -11,13 +11,13 @@
     <dependency>
         <groupId>io.github.itech-framework</groupId>
         <artifactId>core</artifactId>
-        <version>1.0.1</version>
+        <version>${framework-version}</version>
     </dependency>
 
     <dependency>
         <groupId>io.github.itech-framework</groupId>
         <artifactId>java-fx</artifactId>
-        <version>1.0.1</version>
+        <version>${framework-version}</version>
     </dependency>
 
     <dependency>
@@ -26,7 +26,18 @@
         <version>${mysql.8.version}</version>
     </dependency>
 
-    <!-- Other hibernates(v6+) and jarkata persistence api-->
+    <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <version>6.4.4.Final</version>
+    </dependency>
+
+    <!-- JPA API -->
+    <dependency>
+        <groupId>jakarta.persistence</groupId>
+        <artifactId>jakarta.persistence-api</artifactId>
+        <version>3.1.0</version>
+    </dependency>
 </dependencies>
 ```
 
