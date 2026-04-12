@@ -1,19 +1,21 @@
 package io.github.itech_framework.jpa.repository.simple;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+
+import io.github.itech_framework.core.exceptions.FrameworkException;
+import io.github.itech_framework.core.store.ComponentStore;
+import io.github.itech_framework.jpa.config.FlexiJpaConfig;
+import io.github.itech_framework.jpa.repository.FlexiJpaRepository;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
-import io.github.itech_framework.core.store.ComponentStore;
-import io.github.itech_framework.core.exceptions.FrameworkException;
-import io.github.itech_framework.jpa.config.FlexiJpaConfig;
-import io.github.itech_framework.jpa.repository.FlexiJpaRepository;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class SimpleFlexiJpaRepository<T, ID> implements FlexiJpaRepository<T, ID> {
 
@@ -65,12 +67,10 @@ public class SimpleFlexiJpaRepository<T, ID> implements FlexiJpaRepository<T, ID
         }
     }
 
-    private Function<Session, Void> sessionConsumerWrapper(Consumer<Session> consumer) {
-        return session -> {
-            consumer.accept(session);
-            return null;
-        };
-    }
+	/*
+	 * private Function<Session, Void> sessionConsumerWrapper(Consumer<Session>
+	 * consumer) { return session -> { consumer.accept(session); return null; }; }
+	 */
 
     // Enhanced CRUD operations
     @Override
@@ -111,6 +111,14 @@ public class SimpleFlexiJpaRepository<T, ID> implements FlexiJpaRepository<T, ID
         });
     }
 
+    @Override
+    public void deleteAll() {
+        executeVoidTransaction(session -> {
+            String hql = "DELETE FROM " + entityClass.getSimpleName();
+            session.createMutationQuery(hql).executeUpdate();
+        });
+    }
+    
     @Override
     public <R> R executeQuery(Function<Session, R> query) {
         return executeReturningTransaction(query);

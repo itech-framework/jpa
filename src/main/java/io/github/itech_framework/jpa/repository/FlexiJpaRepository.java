@@ -61,4 +61,6 @@ public interface FlexiJpaRepository<T, ID> {
         }
     }
 
+	void deleteAll();
+
 }
